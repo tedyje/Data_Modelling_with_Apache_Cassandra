@@ -30,6 +30,8 @@ def combine_csv_files(subfolder = None):
 
             full_data_rows_list.extend(list(csv_reader))
 
+    # creating a smaller event data csv file called event_datafile_full csv that will be used to insert data into the \
+    # Apache Cassandra tables
     csv.register_dialect('myDialect', quoting=csv.QUOTE_ALL, skipinitialspace=True)
     with open('event_datafile_new.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, dialect = "myDialect")

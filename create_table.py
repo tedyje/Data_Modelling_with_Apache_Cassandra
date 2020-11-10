@@ -1,28 +1,37 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 27 00:52:05 2020
 
-from cassandra.cluster import Cluster
+@author: tewodros
+"""
+
+# import psycopg2
+# from config import config
+# from sql_queries import create_table_queries, drop_table_queries
+# from connect import connect
+from sql_queries import *
+from connect import connect
 
 
-def connect():
+
+def drop_tables(cluster, session):
     """
-    Establish cluster connection and return's the cluster and session references.
-    :return: return's (cur, conn) a cursor and connection
+    Run's all the drop table queries defined in sql_queries.py
+    :param cur: cursor to the database
+    :param conn: database connection reference
+
     """
-    conn = None
+    for query in drop_table_queries:
+        session.execute(query)
 
-    try:
+def create_tables(cur, conn):
+    """
+    Run's all the create table queries defined in sql_queries.py
+    :param cur: cursor to the database
+    :param conn: database connection reference
 
-        # connect to a Cassandra server
-        print("Connecting to the Apache Cassandra cluster ...")
-        cluster = Cluster(['127.0.0.1'])
-
-        # Create a session
-        session = cluster.connect()
-
-        print("Connection Established!!")
-
-    except Exception as e:
-        print(f"Connection Failed !! Error : {e}")
-
-    return cluster, session
+    """
+    for query in create_table_queries:
+        session.execute(query)

@@ -6,82 +6,53 @@ import numpy as np
 import json
 import csv
 
+def combine_csv_files(subfolder = None):
 
-from cql_querries import *
+    current_directory = os.getcwd()
+    print(f"The current working subfolder is: {current_directory}")
 
+    if subfolder:
+        filePathList = glob.glob(os.path.join(current_directory, subfolder, "**", "*"), recursive = True)
 
+    else:
+        fileList = glob.glob(os.path.join(current_directory, "**", "*"), recursive = True)
 
+    # initiating an empty list of rows that will be generated from each file
+    full_data_rows_list = []
 
+    # for every csv file path
+    for filePath in filePathList:
 
-## To-Do: Add in the keyspace you created
-try:
-    session.set_keyspace('music_library_1')
-except Exception as e:
-    print(e)
+        # reading csv file with csv module
+        with open (filePath, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            next(csv_reader)
 
+            full_data_rows_list.extend(list(csv_reader))
 
-## TO-DO: Create the keyspace
-try:
-    session.execute("""
-    CREATE KEYSPACE IF NOT EXISTS music_library_1
-    WITH REPLICATION =
-    { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"""
-)
+    csv.register_dialect('myDialect', quoting=csv.QUOTE_ALL, skipinitialspace=True)
+    with open('event_datafile_new.csv', 'w', encoding = 'utf-8', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file, dialect = "myDialect")
 
-except Exception as e:
-    print(e)
+        csv_writer.writerow(['artist','firstName','gender','itemInSession','lastName','length',\
+                'level','location','sessionId','song','userId'])
 
+        for row in full_data_rows_list:
 
+            if row[0] == '':
+                continue
 
+            csv_writer.writerow((row[0], row[2], row[3], row[4], row[5],row[6], row[7], row[8], row[12], row[13], row[16]))
 
-## TO-DO: Complete the query below
-query = "CREATE TABLE IF NOT EXISTS music_library_table_1 "
-query = query + "(song_title text, artist_name text, year int, album_name text, single Boolean, PRIMARY KEY (year, artist_name))"
-try:
-    session.execute(query)
-except Exception as e:
-    print(e)
-
-
-
-
-## Add in query and then run the insert statement
-query = "INSERT INTO music_library_table_1 (song_title, artist_name, year, album_name, single)"
-query = query + " VALUES (%s, %s, %s, %s, %s)"
-
-try:
-    session.execute(query, ("Across The Universe", "The Beatles", 1970, "Let It Be", False))
-except Exception as e:
-    print(e)
-
-try:
-    session.execute(query, ("Think For Yourself", "The Beatles", 1965, "Rubber Soul", False))
-except Exception as e:
-    print(e)
-
-
-## TO-DO: Complete and then run the select statement to validate the data was inserted into the table
-query = 'SELECT * FROM music_library_table_1'
-try:
-    rows = session.execute(query)
-except Exception as e:
-    print(e)
-
-for row in rows:
-    print (row.year, row.album_name, row.artist_name)
+    return full_data_rows_list
 
 
 
 
-##TO-DO: Complete the select statement to run the query
-query = "SELECT * from music_library_table_1 where YEAR=1970 and artist_name = 'The Beatles'"
-try:
-    rows = session.execute(query)
-except Exception as e:
-    print(e)
+if __name__ == "__main__":
 
-for row in rows:
-    print (row.year, row.album_name, row.artist_name)
+    fileData = combine_csv_files("event_data")
+    print(len(fileData))
 
-session.shutdown()
-cluster.shutdown()
+    with open('event_datafile_new.csv', 'r') as f:
+        print(sum(1 for _ in f))

@@ -25,4 +25,11 @@ def connect():
     except Exception as e:
         print(f"Connection Failed !! Error : {e}")
 
+    session.execute("""
+        CREATE KEYSPACE IF NOT EXISTS sparkify
+        WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }
+        """)
+    session.set_keyspace('sparkify')
+
+
     return cluster, session

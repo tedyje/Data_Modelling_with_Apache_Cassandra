@@ -1,37 +1,52 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 27 00:52:05 2020
 
-@author: tewodros
-"""
 
-# import psycopg2
-# from config import config
-# from sql_queries import create_table_queries, drop_table_queries
-# from connect import connect
-from sql_queries import *
+from cql_queries import drop_table_queries, create_table_queries
 from connect import connect
 
 
-
-def drop_tables(cluster, session):
+def drop_tables(session):
     """
     Run's all the drop table queries defined in sql_queries.py
     :param cur: cursor to the database
     :param conn: database connection reference
 
     """
+    i = 0
     for query in drop_table_queries:
         session.execute(query)
+        i += 1
 
-def create_tables(cur, conn):
+    print(f"{i} Tables dropped successfully!!")
+
+def create_tables(session):
+    
     """
     Run's all the create table queries defined in sql_queries.py
     :param cur: cursor to the database
     :param conn: database connection reference
 
     """
+    i = 0
     for query in create_table_queries:
         session.execute(query)
+        i += 1
+    
+    print(f"{i} Tables were created successfully!!")
+        
+        
+def main():
+    
+    cluster, session = connect()
+    
+    drop_tables(session)
+    create_tables(session)
+    
+    session.shutdown()
+    cluster.shutdown()
+    
+    print("\nConnection closed!!")
+    
+if __name__ == "__main__":
+    main()

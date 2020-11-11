@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from cassandra.cluster import Cluster
+from time import sleep
 
 
 def connect():
@@ -16,11 +17,12 @@ def connect():
         # connect to a Cassandra server
         print("Connecting to the Apache Cassandra cluster ...")
         cluster = Cluster(['127.0.0.1'])
-
+     
         # Create a session
         session = cluster.connect()
-
-        print("Connection Established!!")
+        
+        sleep(2)
+        print("Connection Established!!\n")
 
     except Exception as e:
         print(f"Connection Failed !! Error : {e}")
